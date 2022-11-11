@@ -60,8 +60,25 @@ async function run(){
       })  
 
       app.get('/services', async(req,res)=>{
-        const query = {};
-        const cursor = ServiceCollection.find(query);
+        // const query = {price: {$gt: 150,$lt: 300}};
+
+      
+       
+
+        const order=req.query.order==='asc'? 1: -1;
+        const search=req.query.search
+
+
+        let query={}
+        if(search.length){
+          query={
+            $text:{
+              $search:search
+            }
+          }
+        }
+        
+        const cursor = ServiceCollection.find(query).sort({price: order});
         const services=await cursor.toArray();
         res.send(services)
       })
@@ -108,7 +125,7 @@ app.patch('/orders/:id',verifyJWT, async(req,res)=>{
    const  id=req.params.id
     const status=req.body.status
     const query={_id:ObjectId(id)}
-
+ 
 
 
     const updateDoc = {
@@ -130,6 +147,11 @@ res.send(result)
       })
         
     } 
+
+
+//     catch(err){
+// console.log(err.name,err.message,err.stack)
+//     }
     finally{
 
     }
